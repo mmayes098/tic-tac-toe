@@ -12,6 +12,7 @@ class Board
     @size = size
     @p1 = p1
     @p2 = p2
+    @current_player = "X"
   end
 
   def create
@@ -35,6 +36,25 @@ class Board
     (0...@size).each { |num| p $board_array[num] }
   end
 
+  def getSquare
+    if @current_player == "X"
+      puts "#{@p1}, where would you like to make your X?"
+      puts "Which row first (0-2): "
+      @vertical = gets.chomp.to_i
+      puts "Which column next (0-2): "
+      @horizontal = gets.chomp.to_i
+      self.turnX(@vertical, @horizontal)
+      @current_player = "O"
+    elsif @current_player == "O"
+      puts "#{@p2}, where would you like to make your O?"
+      puts "Which row first (0-2): "
+      @vertical = gets.chomp
+      puts "Which column next (0-2): "
+      @horizontal = gets.chomp
+      self.turnO(@vertical, @horizontal)
+      @current_player = "X"
+    end
+  end 
 end
 
 puts "Enter Player 1's (X) name:"
@@ -48,3 +68,4 @@ p "#{p1} plays X at 1, 0!"
 board.turnX(1, 0)
 p "#{p2} plays O at 0, 1!"
 board.turnO(0, 1)
+board.getSquare
