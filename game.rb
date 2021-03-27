@@ -1,14 +1,10 @@
-# Third, display current player name underneath the board and ask for their vertical column (0-2) and horizontal column (0-2) and save to play variables within the turn fucntion
-# 3.5, check if that is a proper move (nobody has already put a symbol there)
-# Fourth, display proper symbol at the correct spot on the board, redraw the current board
 # Fifth, check if anyone has won with three in a row (separate function)
-# Sixth, ask next player for their turn
 # Seventh, continue taking turns until someone wins, or you get a cat's game
 # Last, display results of the game!
 
 class Board
-  def initialize(size, p1, p2)
-    @size = size
+  def initialize(p1, p2)
+    @size = 3
     @p1 = p1
     @p2 = p2
     @current_player = "X"
@@ -45,6 +41,7 @@ class Board
       @horizontal = gets.chomp.to_i
       if self.validSquare(@vertical, @horizontal)
         self.turnX(@vertical, @horizontal)
+        self.checkWin
         @current_player = "O"
       end
     elsif @current_player == "O"
@@ -55,6 +52,7 @@ class Board
       @horizontal = gets.chomp.to_i
       if self.validSquare(@vertical, @horizontal)
         self.turnO(@vertical, @horizontal)
+        self.checkWin
         @current_player = "X"
       end
     end
@@ -68,49 +66,68 @@ class Board
   end
 
   def play
+    self.create
     while @turns < 9
       self.getSquare
       @turns += 1
+      puts "Nobody wins, it's a cat's game!" if @turns == 9
     end
   end
   
   def checkWin
-    if $board_array[0][0] && $board_array[0][1] && $board_array[0][2] == "X"  #checks all rows
+    @flattened = $board_array.flatten
+    if @flattened[0..2] == ["X", "X", "X"]      #check all rows
       puts "Congratulations #{@p1}! You win the game!"
-    elsif $board_array[0][0] && $board_array[0][1] && $board_array[0][2] == "O"
+      exit
+    elsif @flattened[0..2] == ["O", "O", "O"]
       puts "Congratulations #{@p2}! You win the game!"
-    elsif $board_array[1][0] && $board_array[1][1] && $board_array[1][2] == "X"
+      exit
+    elsif @flattened[3..5] == ["X", "X", "X"]
       puts "Congratulations #{@p1}! You win the game!"
-    elsif $board_array[1][0] && $board_array[1][1] && $board_array[1][2] == "O"
+      exit
+    elsif @flattened[3..5] == ["O", "O", "O"]
       puts "Congratulations #{@p2}! You win the game!"
-    elsif $board_array[2][0] && $board_array[2][1] && $board_array[2][2] == "X"
+      exit
+    elsif @flattened[6..8] == ["X", "X", "X"]
       puts "Congratulations #{@p1}! You win the game!"
-    elsif $board_array[2][0] && $board_array[2][1] && $board_array[2][2] == "O"
+      exit
+    elsif @flattened[6..8] == ["O", "O", "O"]
       puts "Congratulations #{@p2}! You win the game!"
+      exit
     end
+    self.checkColumn(@flattened)
+    self.checkDiag(@flattened)
+  end
 
-    if $board_array[0][0] && $board_array[1][0] && $board_array[2][0] == "X"  #checks all columns
+  def checkColumn(flattened)
+    col1 = []
+    col2 = []
+    col3 = []
+    [0, 3, 6].each { |n| col1 << flattened[n] }
+    [1, 4, 7].each { |n| col2 << flattened[n] }
+    [2, 5, 8].each { |n| col3 << flattened[n] }
+
+    if col1 == ["X", "X", "X"] || col2 == ["X", "X", "X"] || col3 == ["X", "X", "X"]
       puts "Congratulations #{@p1}! You win the game!"
-    elsif $board_array[0][0] && $board_array[1][0] && $board_array[2][0] == "O"
+      exit
+    elsif col1 == ["O", "O", "O"] || col2 == ["O", "O", "O"] || col3 == ["O", "O", "O"]
       puts "Congratulations #{@p2}! You win the game!"
-    elsif $board_array[0][1] && $board_array[1][1] && $board_array[2][1] == "X"
-      puts "Congratulations #{@p1}! You win the game!"
-    elsif $board_array[0][1] && $board_array[1][1] && $board_array[2][1] == "O"
-      puts "Congratulations #{@p2}! You win the game!"
-    elsif $board_array[0][2] && $board_array[1][2] && $board_array[2][2] == "X"
-      puts "Congratulations #{@p1}! You win the game!"
-    elsif $board_array[0][2] && $board_array[1][2] && $board_array[2][2] == "O"
-      puts "Congratulations #{@p2}! You win the game!"
+      exit
     end
+  end
+  
+  def checkDiag(flattened)
+    diag1 = []
+    diag2 = []
+    diag1.push(flattened[0], flattened[4], flattened[8])
+    diag2.push(flattened[2], flattened[4], flattened[6])
 
-    if $board_array[0][0] && $board_array[1][1] && $board_array[2][2] == "X"  #checks diagonals
+    if diag1 == ["X", "X", "X"] || diag2 == ["X", "X", "X"]
       puts "Congratulations #{@p1}! You win the game!"
-    elsif $board_array[0][0] && $board_array[1][1] && $board_array[2][2] == "O"
+      exit
+    elsif diag1 == ["O", "O", "O"] || diag2 == ["O", "O", "O"]
       puts "Congratulations #{@p2}! You win the game!"
-    elsif $board_array[0][2] && $board_array[1][1] && $board_array[2][0] == "X"
-      puts "Congratulations #{@p1}! You win the game!"
-    elsif $board_array[0][2] && $board_array[1][1] && $board_array[2][0] == "O"
-      puts "Congratulations #{@p2}! You win the game!"
+      exit
     end
   end
 end
@@ -119,16 +136,5 @@ puts "Enter Player 1's (X) name:"
 p1 = gets.chomp
 puts "Enter Player 2's (O) name:"
 p2 = gets.chomp
-board = Board.new(3, p1, p2)
-board.create
+board = Board.new(p1, p2)
 board.play
-# p "The board was created!"
-# p "#{p1} plays X at 1, 0!"
-# board.turnX(1, 0)
-# p "#{p2} plays O at 0, 1!"
-# board.turnO(0, 1)
-# board.getSquare
-# board.turnX(0, 0)
-# board.turnX(1, 1)
-# board.turnX(1, 2)
-# board.checkWin
