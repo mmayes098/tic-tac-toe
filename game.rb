@@ -12,6 +12,7 @@ class Board
     @p1 = p1
     @p2 = p2
     @current_player = "X"
+    @turns = 0
   end
 
   def create
@@ -42,16 +43,34 @@ class Board
       @vertical = gets.chomp.to_i
       puts "Which column next (0-2): "
       @horizontal = gets.chomp.to_i
-      self.turnX(@vertical, @horizontal)
-      @current_player = "O"
+      if self.validSquare(@vertical, @horizontal)
+        self.turnX(@vertical, @horizontal)
+        @current_player = "O"
+      end
     elsif @current_player == "O"
       puts "#{@p2}, where would you like to make your O?"
       puts "Which row first (0-2): "
       @vertical = gets.chomp.to_i
       puts "Which column next (0-2): "
       @horizontal = gets.chomp.to_i
-      self.turnO(@vertical, @horizontal)
-      @current_player = "X"
+      if self.validSquare(@vertical, @horizontal)
+        self.turnO(@vertical, @horizontal)
+        @current_player = "X"
+      end
+    end
+  end
+
+  def validSquare(vertical, horizontal)
+    return true if $board_array[vertical][horizontal] == "_"
+
+    puts "That isn't a valid move!"
+    self.getSquare
+  end
+
+  def play
+    while @turns < 9
+      self.getSquare
+      @turns += 1
     end
   end
   
@@ -102,13 +121,14 @@ puts "Enter Player 2's (O) name:"
 p2 = gets.chomp
 board = Board.new(3, p1, p2)
 board.create
+board.play
 # p "The board was created!"
 # p "#{p1} plays X at 1, 0!"
 # board.turnX(1, 0)
 # p "#{p2} plays O at 0, 1!"
 # board.turnO(0, 1)
 # board.getSquare
-board.turnX(0, 0)
-board.turnX(1, 1)
-board.turnX(1, 2)
-board.checkWin
+# board.turnX(0, 0)
+# board.turnX(1, 1)
+# board.turnX(1, 2)
+# board.checkWin
